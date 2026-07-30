@@ -45,4 +45,17 @@ public class FoundItemTests
         Assert.Throws<InvalidOperationException>(() =>
             item.Claim("Kari Nordmann"));
     }
+
+    [Fact]
+    public void Claimed_item_can_be_returned()
+    {
+        var item = new FoundItem();
+
+        item.Claim("Ola");
+
+        item.Return();
+
+        Assert.Equal(FoundItemStatus.Returned, item.Status);
+        Assert.NotNull(item.ReturnedAtUtc);
+    }
 }
