@@ -17,4 +17,9 @@ public class FoundItemsService
         await _repository.AddAsync(item);
         await _repository.SaveChangesAsync();
     }
+
+    public async Task<FoundItem?> GetByIdAsync(Guid id)
+    {
+        return await _repository.GetByIdAsync(id);
+    }
 }
