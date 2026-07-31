@@ -22,4 +22,25 @@ public class FoundItemsService
     {
         return await _repository.GetByIdAsync(id);
     }
+
+    public async Task<IEnumerable<FoundItem>> GetAllAsync()
+    {
+        return await _repository.GetAllAsync();
+    }
+
+    public async Task<FoundItem> ClaimAsync(Guid id, string claimedBy)
+    {
+        var item = await _repository.GetByIdAsync(id);
+
+        if (item == null)
+        {
+            throw new InvalidOperationException("Item not found");
+        }
+
+        item.Claim(claimedBy);
+
+        await _repository.SaveChangesAsync();
+
+        return item;
+    }
 }
