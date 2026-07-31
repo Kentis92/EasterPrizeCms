@@ -59,8 +59,8 @@ public class FoundItemTests
         Assert.NotNull(item.ReturnedAtUtc);
     }
 
-[Fact]
-public void New_item_should_store_basic_information()
+    [Fact]
+    public void New_item_should_store_basic_information()
     {
         var item = new FoundItem(
             "Blå jakke",
@@ -75,8 +75,8 @@ public void New_item_should_store_basic_information()
         Assert.Equal("Scene 2", item.FoundLocation);
     }
 
-[Fact]
-public void Claim_should_store_claim_information()
+    [Fact]
+    public void Claim_should_store_claim_information()
     {
         var item = new FoundItem();
 
@@ -86,16 +86,16 @@ public void Claim_should_store_claim_information()
         Assert.NotNull(item.ClaimedAtUtc);
     }
 
-[Fact]
-public void Available_item_can_be_deleted()
+    [Fact]
+    public void Available_item_can_be_deleted()
     {
         var item = new FoundItem();
 
         Assert.True(item.CanBeDeleted());
     }
 
-[Fact]
-public void Claimed_item_cannot_be_deleted()
+    [Fact]
+    public void Claimed_item_cannot_be_deleted()
     {
         var item = new FoundItem();
 
@@ -103,6 +103,4 @@ public void Claimed_item_cannot_be_deleted()
 
         Assert.False(item.CanBeDeleted());
     }
-
-
 }
