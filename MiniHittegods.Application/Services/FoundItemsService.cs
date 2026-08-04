@@ -32,12 +32,38 @@ public class FoundItemsService
     {
         var item = await _repository.GetByIdAsync(id);
 
-        if (item == null)
-        {
-            throw new InvalidOperationException("Item not found");
-        }
+        if (item is null)
+            throw new InvalidOperationException("Item not found.");
 
         item.Claim(claimedBy);
+
+        await _repository.SaveChangesAsync();
+
+        return item;
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var item = await _repository.GetByIdAsync(id);
+
+        if (item is null)
+            throw new InvalidOperationException("Item not found.");
+
+        if (!item.CanBeDeleted())
+            throw new InvalidOperationException("Item cannot be deleted.");
+
+        await _repository.DeleteAsync(id);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task<FoundItem> ReturnAsync(Guid id)
+    {
+        var item = await _repository.GetByIdAsync(id);
+
+        if (item is null)
+            throw new InvalidOperationException("Item not found.");
+
+        item.Return();
 
         await _repository.SaveChangesAsync();
 

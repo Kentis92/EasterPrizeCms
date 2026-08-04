@@ -107,4 +107,66 @@ public async Task Claim_item_should_change_status_to_claimed()
     Assert.Equal(FoundItemStatus.Claimed, result.Status);
     Assert.Equal("Ola Nordmann", result.ClaimedBy);
 }
+
+[Fact]
+public async Task Delete_available_item_should_remove_it()
+    {
+        var repository = new FakeFoundItemRepository();
+        var Service = new FoundItemsService(repository);
+
+        var item = new FoundItem(
+            "Blå jakke",
+            "Norge skrevet på ryggen",
+            "Clothing",
+            "Scene 2");
+
+        await repository.AddAsync(item);
+
+        await Service.DeleteAsync(item.Id);
+
+        var result = await repository.GetByIdAsync(item.Id);
+
+        Assert.Null(result);
+    }
+[Fact]
+public async Task Delete_claimed_item_throw_exception()
+    {
+        var repository = new FakeFoundItemRepository();
+        var Service = new FoundItemsService(repository);
+
+        var item = new FoundItem(
+            "Blå jakke",
+            "Norge skrevet på ryggen",
+            "Clothing",
+            "Scene 2");
+
+            await repository.AddAsync(item);
+
+            item.Claim("Ola Nordmann");
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await Service.DeleteAsync(item.Id));
+    }
+[Fact]
+public async Task Return_item_should_change_status_to_returned()
+    {
+        var repository = new FakeFoundItemRepository();
+        var service = new FoundItemsService(repository);
+
+        var item = new FoundItem(
+            "Mobil",
+            "iPhone",
+            "Phone",
+            "Scene 1");
+
+            await repository.AddAsync(item);
+
+            await service.ClaimAsync(item.Id, "Ola Nordmann");
+
+            var result = await service.ReturnAsync(item.Id);
+
+            Assert.Equal(FoundItemStatus.Returned, result.Status);
+            Assert.NotNull(result.ReturnedAtUtc);
+
+    }
 }
