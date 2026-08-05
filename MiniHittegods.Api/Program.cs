@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using MiniHittegods.Api.Data;
 using MiniHittegods.Api.Repositories;
 using MiniHittegods.Application.Interfaces;
 using MiniHittegods.Application.Services;
@@ -6,7 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<IFoundItemRepository, InMemoryFoundItemRepository>();
+builder.Services.AddDbContext<MiniHittegodsDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
+
+builder.Services.AddScoped<IFoundItemRepository, EfFoundItemRepository>();
 builder.Services.AddScoped<FoundItemsService>();
 
 builder.Services.AddEndpointsApiExplorer();
