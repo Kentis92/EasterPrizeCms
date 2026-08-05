@@ -56,18 +56,67 @@ public class ItemsController : ControllerBase
         return Ok(item);
     }
 
-[HttpPost("{id}/claim")]
-public async Task<IActionResult> Claim(Guid id, ClaimItemRequest request)
-{
-    var item = await _service.GetByIdAsync(id);
-
-    if (item == null)
+    [HttpPost("{id}/claim")]
+    public async Task<IActionResult> Claim(Guid id, ClaimItemRequest request)
     {
-        return NotFound();
+        var item = await _service.GetByIdAsync(id);
+
+        if (item == null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            var result = await _service.ClaimAsync(id, request.ClaimedBy);
+
+            return Ok(result);
+        }
+        catch (InvalidOperationException)
+        {
+            return Conflict();
+        }
     }
 
-    var result = await _service.ClaimAsync(id, request.ClaimedBy);
+    [HttpPost("{id}/return")]
+    public async Task<IActionResult> Return(Guid id)
+    {
+        var item = await _service.GetByIdAsync(id);
 
-    return Ok(result);
-}
+        if (item == null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            var result = await _service.ReturnAsync(id);
+
+            return Ok(result);
+        }
+        catch (InvalidOperationException)
+        {
+            return Conflict();
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var item = await _service.GetByIdAsync(id);
+
+        if (item == null)
+        {
+            return NotFound();
+        }
+
+        if (!item.CanBeDeleted())
+        {
+            return Conflict();
+        }
+
+        await _service.DeleteAsync(id);
+
+        return NoContent();
+    }
 }

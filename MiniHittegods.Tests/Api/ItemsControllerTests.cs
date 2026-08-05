@@ -101,4 +101,135 @@ public class ItemsControllerTests : IClassFixture<WebApplicationFactory<Program>
             HttpStatusCode.OK,
             response.StatusCode);
     }
+
+    [Fact]
+    public async Task Return_item_should_return_200_ok()
+    {
+        var createRequest = new
+        {
+            title = "Mobil",
+            description = "Sort iPhone",
+            category = "Electronics",
+            foundLocation = "Scene 3"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/items",
+            createRequest);
+
+        var location = createResponse.Headers.Location!.ToString();
+
+        var id = location.Split('/').Last();
+
+        await _client.PostAsJsonAsync(
+            $"/api/items/{id}/claim",
+            new
+            {
+                claimedBy = "Ola Nordmann"
+            });
+
+        var response = await _client.PostAsync(
+            $"/api/items/{id}/return",
+            null);
+
+        Assert.Equal(
+            HttpStatusCode.OK,
+            response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Delete_item_should_return_204_no_content()
+    {
+        var createRequest = new
+        {
+            title = "Nøkler",
+            description = "Bilnøkler",
+            category = "Keys",
+            foundLocation = "Inngang"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/items",
+            createRequest);
+
+        var location = createResponse.Headers.Location!.ToString();
+
+        var response = await _client.DeleteAsync(location);
+
+        Assert.Equal(
+            HttpStatusCode.NoContent,
+            response.StatusCode);
+    }
+
+[Fact]
+public async Task Delete_claimed_item_should_return_409_conflict()
+    {
+        var createRequest = new
+        {
+            title = "Telefon",
+            description = "Svart mobil",
+            category = "Electronics",
+            foundLocation = "Scene 4"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/items",
+            createRequest);
+
+            var location = createResponse.Headers.Location!.ToString();
+
+            var id = location.Split('/').Last();
+
+            await _client.PostAsJsonAsync(
+                $"/api/items/{id}/claim",
+                new
+                {
+                    claimedBy = "Ola Nordmann"
+                });
+
+            var response = await _client.DeleteAsync(
+                location);
+
+                Assert.Equal(
+                    HttpStatusCode.Conflict,
+                    response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Claim_already_claimed_item_should_return_409_conflict()
+    {
+        var createRequest = new
+        {
+            title = "PC",
+            description = "Gaming laptop",
+            category = "Electronics",
+            foundLocation = "Scene 5"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync(
+            "/api/items",
+            createRequest);
+
+        var location = createResponse.Headers.Location!.ToString();
+
+        var id = location.Split('/').Last();
+
+        await _client.PostAsJsonAsync(
+            $"/api/items/{id}/claim",
+            new
+            {
+                claimedBy = "Ola Nordmann"
+            });
+
+        var response = await _client.PostAsJsonAsync(
+            $"/api/items/{id}/claim",
+            new
+            {
+                claimedBy = "Kari Nordmann"
+            });
+
+        Assert.Equal(
+            HttpStatusCode.Conflict,
+            response.StatusCode);
+    }
 }
