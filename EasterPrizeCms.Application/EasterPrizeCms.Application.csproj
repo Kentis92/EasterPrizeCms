@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\MiniHittegods.Domain\MiniHittegods.Domain.csproj" />
+    <ProjectReference Include="..\EasterPrizeCms.Domain\EasterPrizeCms.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

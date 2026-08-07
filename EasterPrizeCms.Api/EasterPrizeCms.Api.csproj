@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MiniHittegods.Domain\MiniHittegods.Domain.csproj" />
-    <ProjectReference Include="..\MiniHittegods.Application\MiniHittegods.Application.csproj" />
+    <ProjectReference Include="..\EasterPrizeCms.Domain\EasterPrizeCms.Domain.csproj" />
+    <ProjectReference Include="..\EasterPrizeCms.Application\EasterPrizeCms.Application.csproj" />
   </ItemGroup>
 
 </Project>

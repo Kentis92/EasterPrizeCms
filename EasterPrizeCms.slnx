@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EasterPrizeCms.Api/EasterPrizeCms.Api.csproj" />
+  <Project Path="EasterPrizeCms.Application/EasterPrizeCms.Application.csproj" />
+  <Project Path="EasterPrizeCms.Domain/EasterPrizeCms.Domain.csproj" />
+  <Project Path="EasterPrizeCms.Tests/EasterPrizeCms.Tests.csproj" />
+</Solution>
