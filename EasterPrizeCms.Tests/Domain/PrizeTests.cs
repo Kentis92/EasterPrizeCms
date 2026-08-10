@@ -25,4 +25,18 @@ public class PrizeTests
     {
         Assert.Throws<ArgumentException>(() => new Prize(""));
     }
+
+    [Fact]
+    public void New_prize_should_have_value()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        Assert.Equal(250, prize.Value);
+    }
+
+    [Fact]
+    public void Prize_should_not_allow_negative_value()
+    {
+        Assert.Throws<ArgumentException>(() => new Prize("Påskeegg XL", -1));
+    }
 }
