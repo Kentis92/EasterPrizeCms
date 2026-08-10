@@ -1,14 +1,11 @@
-using EasterPrizeCms.Application.Services;
+using EasterPrizeCms.Domain.Entities;
 
-namespace EasterPrizeCms.Tests.Application;
+namespace EasterPrizeCms.Application.Services;
 
-public class ParticipantServiceTests
+public class ParticipantService
 {
-    [Fact]
-    public void Participant_service_can_be_created()
+    public Participant Create(string name, int age, string city)
     {
-        var service = new ParticipantService();
-
-        Assert.NotNull(service);
+        return new Participant(name, age, city);
     }
 }
