@@ -4,6 +4,7 @@ public class Participant
 {
     public string Name { get; }
     public int Age { get; }
+    public string City { get; }
 
     public Participant(string name)
     {
@@ -14,5 +15,12 @@ public class Participant
     {
         Name = name;
         Age = age;
+    }
+
+    public Participant(string name, int age, string city)
+    {
+        Name = name;
+        Age = age;
+        City = city;
     }
 }

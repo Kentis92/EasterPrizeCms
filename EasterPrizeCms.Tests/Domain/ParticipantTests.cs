@@ -19,4 +19,11 @@ public class ParticipantTests
 
         Assert.Equal(25, participant.Age);
     }
+    [Fact]
+    public void New_Participant_should_have_city()
+    {
+        var participant = new Participant("Ola Nordmann", 25, "Oslo");
+
+        Assert.Equal("Oslo", participant.City);
+    }
 }
