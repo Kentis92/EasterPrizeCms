@@ -47,4 +47,30 @@ public class ParticipantServiceTests
         Assert.Throws<ArgumentException>(() =>
             service.Create("A", 10, "Oslo"));
     }
+    [Fact]
+    public void Create_participant_should_reject_name_longer_than_80_characters()
+    {
+        var service = new ParticipantService();
+        var name = new string('A', 81);
+
+        Assert.Throws<ArgumentException>(() =>
+            service.Create(name, 10, "Oslo"));
+    }
+    [Fact]
+    public void Create_participant_should_reject_city_shorter_than_2_characters()
+    {
+        var service = new ParticipantService();
+        
+        Assert.Throws<ArgumentException>(() =>
+            service.Create("Ola", 10, "0"));
+    }
+    [Fact]
+    public void Create_participant_should_reject_city_longer_than_80_characters()
+    {
+        var service = new ParticipantService();
+        var city = new string('A', 81);
+
+        Assert.Throws<ArgumentException>(() =>
+            service.Create("Ola", 10, city));
+    }
 }
