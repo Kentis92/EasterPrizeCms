@@ -1,3 +1,5 @@
+using EasterPrizeCms.Domain.Enums;
+
 namespace EasterPrizeCms.Domain.Entities;
 
 public class Participant
@@ -22,5 +24,10 @@ public class Participant
         Name = name;
         Age = age;
         City = city;
+    }
+
+    public bool CanDelete(IEnumerable<Prize> prizes)
+    {
+        return !prizes.Any(prize => prize.Status == PrizeStatus.Assigned);
     }
 }
