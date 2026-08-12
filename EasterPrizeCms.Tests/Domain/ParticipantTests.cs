@@ -40,11 +40,14 @@ public class ParticipantTests
     }
     
     [Fact]
-    public void Participant_without_assigned_prize_should_be_deletable()
+    public void Participant_with_collected_prizes_should_be_deletable()
     {
         var participant = new Participant("Ola Nordmann", 25, "Oslo");
         var prize = new Prize("Påskeegg XL", 250);
 
-        Assert.True(participant.CanDelete(new[] { prize}));
+        prize.Assign();
+        prize.Collect();
+
+        Assert.True(participant.CanDelete(new[] { prize }));
     }
 }
