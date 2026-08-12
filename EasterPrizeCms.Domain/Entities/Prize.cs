@@ -42,4 +42,12 @@ public class Prize
 
         Status = PrizeStatus.Assigned;
     }
+
+    public void Collect()
+    {
+        if (Status != PrizeStatus.Assigned)
+            throw new InvalidOperationException("Prize can only be collected when assigned.");
+
+        Status = PrizeStatus.Collected;
+    }
 }

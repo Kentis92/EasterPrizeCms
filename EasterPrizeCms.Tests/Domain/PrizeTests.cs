@@ -59,4 +59,34 @@ public class PrizeTests
 
         Assert.Throws<InvalidOperationException>(() => prize.Assign());
     }
+    
+    [Fact]
+    public void Assigned_prize_should_be_collectable()
+    {
+    var prize = new Prize("Påskeegg XL", 250);
+
+    prize.Assign();
+    prize.Collect();
+
+    Assert.Equal(PrizeStatus.Collected, prize.Status);
+    }
+
+    [Fact]
+    public void In_stock_prize_should_not_be_collectable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        Assert.Throws<InvalidOperationException>(() => prize.Collect());
+    }
+
+    [Fact]
+    public void Assigned_prize_should_be_collectable_again()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+        prize.Collect();
+
+        Assert.Throws<InvalidOperationException>(() => prize.Collect());
+    }
 }
