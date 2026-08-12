@@ -6,7 +6,7 @@ public class Prize
 {
     public string Name { get; }
     public decimal Value { get; }
-    public PrizeStatus Status { get; }
+    public PrizeStatus Status { get; private set; }
 
     public Prize()
     {
@@ -33,5 +33,13 @@ public class Prize
         Name = name;
         Value = value;
         Status = PrizeStatus.InStock;
+    }
+
+    public void Assign()
+    {
+        if (Status != PrizeStatus.InStock)
+            throw new InvalidOperationException("Prize can only be assigned when it is in stock.");
+
+        Status = PrizeStatus.Assigned;
     }
 }

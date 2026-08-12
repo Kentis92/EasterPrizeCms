@@ -39,4 +39,24 @@ public class PrizeTests
     {
         Assert.Throws<ArgumentException>(() => new Prize("Påskeegg XL", -1));
     }
+
+    [Fact]
+    public void In_stock_prize_should_be_assignable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+
+        Assert.Equal(PrizeStatus.Assigned, prize.Status);
+    }
+
+    [Fact]
+    public void Assigned_prize_should_not_be_assignable_again()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+
+        Assert.Throws<InvalidOperationException>(() => prize.Assign());
+    }
 }
