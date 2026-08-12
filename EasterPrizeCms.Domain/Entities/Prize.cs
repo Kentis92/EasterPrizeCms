@@ -50,4 +50,9 @@ public class Prize
 
         Status = PrizeStatus.Collected;
     }
+
+    public bool CanDelete()
+    {
+        return Status != PrizeStatus.Collected;
+    }
 }

@@ -20,6 +20,7 @@ public class PrizeTests
 
         Assert.Equal("Påskeegg XL", prize.Name);
     }
+
     [Fact]
     public void Prize_should_not_allow_empty_name()
     {
@@ -41,7 +42,7 @@ public class PrizeTests
     }
 
     [Fact]
-    public void In_stock_prize_should_be_assignable()
+    public void Prize_should_be_assignable_when_in_stock()
     {
         var prize = new Prize("Påskeegg XL", 250);
 
@@ -59,16 +60,27 @@ public class PrizeTests
 
         Assert.Throws<InvalidOperationException>(() => prize.Assign());
     }
-    
+
+    [Fact]
+    public void Collected_prize_should_not_be_assignable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+        prize.Collect();
+
+        Assert.Throws<InvalidOperationException>(() => prize.Assign());
+    }
+
     [Fact]
     public void Assigned_prize_should_be_collectable()
     {
-    var prize = new Prize("Påskeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
 
-    prize.Assign();
-    prize.Collect();
+        prize.Assign();
+        prize.Collect();
 
-    Assert.Equal(PrizeStatus.Collected, prize.Status);
+        Assert.Equal(PrizeStatus.Collected, prize.Status);
     }
 
     [Fact]
@@ -80,7 +92,7 @@ public class PrizeTests
     }
 
     [Fact]
-    public void Assigned_prize_should_be_collectable_again()
+    public void Collected_prize_should_not_be_collectable_again()
     {
         var prize = new Prize("Påskeegg XL", 250);
 
@@ -88,5 +100,34 @@ public class PrizeTests
         prize.Collect();
 
         Assert.Throws<InvalidOperationException>(() => prize.Collect());
+    }
+
+    [Fact]
+    public void Collected_prize_should_not_be_deletable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+        prize.Collect();
+
+        Assert.False(prize.CanDelete());
+    }
+
+    [Fact]
+    public void In_stock_prize_should_be_deletable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        Assert.True(prize.CanDelete());
+    }
+
+    [Fact]
+    public void Assigned_prize_should_be_deletable()
+    {
+        var prize = new Prize("Påskeegg XL", 250);
+
+        prize.Assign();
+
+        Assert.True(prize.CanDelete());
     }
 }
