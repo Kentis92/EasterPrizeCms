@@ -130,4 +130,19 @@ public class PrizeTests
 
         Assert.True(prize.CanDelete());
     }
+
+    [Fact]
+    public void Prize_should_not_allow_name_shorter_than_2_characters()
+    {
+        
+        Assert.Throws<ArgumentException>(() => new Prize("A", 250));
+    }
+
+    [Fact]
+    public void Prize_should_not_allow_name_longer_than_80_characters()
+    {
+        var name = new String('A', 81);
+
+        Assert.Throws<ArgumentException>(() => new Prize(name, 250));
+    }
 }

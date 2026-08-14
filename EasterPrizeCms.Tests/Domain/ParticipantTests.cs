@@ -50,4 +50,55 @@ public class ParticipantTests
 
         Assert.True(participant.CanDelete(new[] { prize }));
     }
+    [Fact]
+    public void Participant_should_not_allow_empty_name()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant(""));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_name_shorter_than_2_characters()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant("A"));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_name_longer_than_80_characters()
+    {
+    var name = new string('A', 81);
+
+    Assert.Throws<ArgumentException>(() => new Participant(name));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_age_below_0()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant("Ola Nordmann", -1));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_age_above_120()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant("Ola Nordmann", 121));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_empty_city()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant("Ola Nordmann", 25, ""));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_city_shorter_than_2_characters()
+    {
+    Assert.Throws<ArgumentException>(() => new Participant("Ola Nordmann", 25, "A"));
+    }
+
+    [Fact]
+    public void Participant_should_not_allow_city_longer_than_80_characters()
+    {
+    var city = new string('A', 81);
+
+    Assert.Throws<ArgumentException>(() => new Participant("Ola Nordmann", 25, city));
+    }
 }

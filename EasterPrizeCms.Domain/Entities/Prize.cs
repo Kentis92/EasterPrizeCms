@@ -18,6 +18,9 @@ public class Prize
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Prize name cannot be empty.", nameof(name));
 
+        if (name.Length < 2 || name.Length > 80)
+            throw new ArgumentException("Prize name must be between 2 and 80 characters.", nameof(name));
+
         Name = name;
         Status = PrizeStatus.InStock;
     }
@@ -26,6 +29,9 @@ public class Prize
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Prize name cannot be empty.", nameof(name));
+
+        if (name.Length < 2 || name.Length > 80)
+            throw new ArgumentException("Prize name must be between 2 and 80 characters.", nameof(name));
 
         if (value < 0)
             throw new ArgumentException("Prize value cannot be negative.", nameof(value));
