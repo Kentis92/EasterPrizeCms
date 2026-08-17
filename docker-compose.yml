@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16
-    container_name: minihittegods-postgres
+    container_name: easterprizecms-postgres
     environment:
-      POSTGRES_DB: minihittegods
+      POSTGRES_DB: easterprizecms
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - minihittegods_data:/var/lib/postgresql/data
+      - easterprizecms_data:/var/lib/postgresql/data
 
 
 volumes:
-  minihittegods_data:
+  easterprizecms_data:
