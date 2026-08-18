@@ -1,5 +1,7 @@
+using EasterPrizeCms.Application.DTOs;
 using EasterPrizeCms.Application.Repositories;
 using EasterPrizeCms.Domain.Entities;
+using EasterPrizeCms.Domain.Enums;
 
 namespace EasterPrizeCms.Application.Services;
 
@@ -81,5 +83,21 @@ public class PrizeService
         prize.Collect();
 
         await _repository.UpdateAsync(prize);
+    }
+
+    public async Task<PrizeStatisticsResponse> GetStatisticsAsync()
+    {
+        var prizes = await _repository.GetAllAsync();
+        var prizeList = prizes.ToList();
+
+        return new PrizeStatisticsResponse
+        {
+            TotalPrizes = prizeList.Count,
+            InStock = prizeList.Count(p => p.Status == PrizeStatus.InStock),
+            Assigned = prizeList.Count(p => p.Status == PrizeStatus.Assigned),
+            Collected = prizeList.Count(p => p.Status == PrizeStatus.Collected),
+            TotalValue = prizeList.Sum(p => p.Value),
+            AverageValue = prizeList.Count == 0 ? 0 : prizeList.Average(p => p.Value),
+        };
     }
 }

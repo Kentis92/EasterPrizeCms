@@ -22,9 +22,9 @@ public class PrizeServiceTests
         var repository = new FakePrizeRepository();
         var service = new PrizeService(repository);
 
-        var prize = service.Create("P�skeegg XL", 250);
+        var prize = service.Create("Påskeegg XL", 250);
 
-        Assert.Equal("P�skeegg XL", prize.Name);
+        Assert.Equal("Påskeegg XL", prize.Name);
         Assert.Equal(250, prize.Value);
         Assert.Equal(PrizeStatus.InStock, prize.Status);
     }
@@ -63,28 +63,28 @@ public class PrizeServiceTests
         var repository = new FakePrizeRepository();
         var service = new PrizeService(repository);
 
-        Assert.Throws<ArgumentException>(() => service.Create("P�skeegg XL", -1));
+        Assert.Throws<ArgumentException>(() => service.Create("Påskeegg XL", -1));
     }
 
     [Fact]
     public async Task Get_all_prizes_should_return_prizes()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
 
         var result = await service.GetAllAsync();
 
         Assert.Single(result);
-        Assert.Equal("P�skeegg XL", result.First().Name);
+        Assert.Equal("Påskeegg XL", result.First().Name);
     }
 
     [Fact]
     public async Task Get_prize_by_id_should_return_prize()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
@@ -92,21 +92,21 @@ public class PrizeServiceTests
         var result = await service.GetByIdAsync(1);
 
         Assert.NotNull(result);
-        Assert.Equal("P�skeegg XL", result.Name);
+        Assert.Equal("Påskeegg XL", result.Name);
     }
 
     [Fact]
     public async Task Update_prize_should_update_data()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
 
-        await service.UpdateAsync(1, "P�skeegg XXL", 500);
+        await service.UpdateAsync(1, "Påskeegg XXL", 500);
 
-        Assert.Equal("P�skeegg XXL", prize.Name);
+        Assert.Equal("Påskeegg XXL", prize.Name);
         Assert.Equal(500, prize.Value);
     }
 
@@ -114,7 +114,7 @@ public class PrizeServiceTests
     public async Task Delete_prize_should_remove_prize()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
@@ -128,7 +128,7 @@ public class PrizeServiceTests
     public async Task Assign_prize_should_assign_prize_to_participant()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
@@ -143,7 +143,7 @@ public class PrizeServiceTests
     public async Task Collect_prize_should_mark_prize_as_collected()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         prize.Assign(5);
         await repository.AddAsync(prize);
@@ -161,7 +161,8 @@ public class PrizeServiceTests
         var service = new PrizeService(repository);
 
         await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            service.UpdateAsync(999, "P�skeegg", 100));
+            service.UpdateAsync(999, "Påskeegg", 100)
+        );
     }
 
     [Fact]
@@ -170,8 +171,7 @@ public class PrizeServiceTests
         var repository = new FakePrizeRepository();
         var service = new PrizeService(repository);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            service.DeleteAsync(999));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.DeleteAsync(999));
     }
 
     [Fact]
@@ -180,8 +180,7 @@ public class PrizeServiceTests
         var repository = new FakePrizeRepository();
         var service = new PrizeService(repository);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            service.AssignAsync(999, 5));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.AssignAsync(999, 5));
     }
 
     [Fact]
@@ -190,23 +189,49 @@ public class PrizeServiceTests
         var repository = new FakePrizeRepository();
         var service = new PrizeService(repository);
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-            service.CollectAsync(999));
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.CollectAsync(999));
     }
 
     [Fact]
     public async Task Collected_prize_should_not_be_deletable()
     {
         var repository = new FakePrizeRepository();
-        var prize = new Prize("P�skeegg XL", 250);
+        var prize = new Prize("Påskeegg XL", 250);
         prize.Id = 1;
         prize.Assign(5);
         prize.Collect();
         await repository.AddAsync(prize);
         var service = new PrizeService(repository);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            service.DeleteAsync(1));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeleteAsync(1));
+    }
+
+    [Fact]
+    public async Task Get_statistics_should_return_correct_counts_and_values()
+    {
+        var repository = new FakePrizeRepository();
+
+        var inStockPrize = new Prize("Påskeegg", 100);
+        var assignedPrize = new Prize("Nintendo", 300);
+        assignedPrize.Assign(1);
+        var collectedPrize = new Prize("PlayStation", 500);
+        collectedPrize.Assign(2);
+        collectedPrize.Collect();
+
+        await repository.AddAsync(inStockPrize);
+        await repository.AddAsync(assignedPrize);
+        await repository.AddAsync(collectedPrize);
+
+        var service = new PrizeService(repository);
+
+        var result = await service.GetStatisticsAsync();
+
+        Assert.Equal(3, result.TotalPrizes);
+        Assert.Equal(1, result.InStock);
+        Assert.Equal(1, result.Assigned);
+        Assert.Equal(1, result.Collected);
+        Assert.Equal(900, result.TotalValue);
+        Assert.Equal(300, result.AverageValue);
     }
 
     private class FakePrizeRepository : IPrizeRepository

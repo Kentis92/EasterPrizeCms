@@ -34,6 +34,14 @@ public class PrizesController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("statistics")]
+    public async Task<ActionResult<PrizeStatisticsResponse>> GetStatistics()
+    {
+        var statistics = await _service.GetStatisticsAsync();
+
+        return Ok(statistics);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<ActionResult<PrizeResponse>> GetById(int id)
     {

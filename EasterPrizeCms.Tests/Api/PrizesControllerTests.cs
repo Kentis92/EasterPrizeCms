@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using EasterPrizeCms.Application.DTOs;
 using EasterPrizeCms.Application.Repositories;
 using EasterPrizeCms.Domain.Entities;
+using EasterPrizeCms.Domain.Enums;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -168,6 +169,35 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Get_prize_statistics_should_return_200_ok_with_statistics()
+    {
+        var inStockPrize = new Prize("Påskeegg", 100);
+        var assignedPrize = new Prize("Nintendo", 300);
+        assignedPrize.Assign(1);
+        var collectedPrize = new Prize("PlayStation", 500);
+        collectedPrize.Assign(2);
+        collectedPrize.Collect();
+
+        await _repository.AddAsync(inStockPrize);
+        await _repository.AddAsync(assignedPrize);
+        await _repository.AddAsync(collectedPrize);
+
+        var response = await _client.GetAsync("/api/prizes/statistics");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<PrizeStatisticsResponse>();
+
+        Assert.NotNull(result);
+        Assert.Equal(3, result.TotalPrizes);
+        Assert.Equal(1, result.InStock);
+        Assert.Equal(1, result.Assigned);
+        Assert.Equal(1, result.Collected);
+        Assert.Equal(900, result.TotalValue);
+        Assert.Equal(300, result.AverageValue);
+    }
 }
 
 public class PrizesApiFactory : WebApplicationFactory<Program>
@@ -187,6 +217,11 @@ public class PrizesApiFactory : WebApplicationFactory<Program>
 public class FakePrizeRepository : IPrizeRepository
 {
     private readonly List<Prize> _prizes = [];
+
+    public void Clear()
+    {
+        _prizes.Clear();
+    }
 
     public Task<IEnumerable<Prize>> GetAllAsync()
     {
@@ -217,10 +252,5 @@ public class FakePrizeRepository : IPrizeRepository
     {
         _prizes.Remove(prize);
         return Task.CompletedTask;
-    }
-
-    public void Clear()
-    {
-        _prizes.Clear();
     }
 }
