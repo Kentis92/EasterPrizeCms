@@ -4,16 +4,28 @@ namespace EasterPrizeCms.Domain.Entities;
 
 public class Participant
 {
-    public string Name { get; }
-    public int Age { get; }
-    public string City { get; }
+    public int Id { get; set; }
+    public string FullName { get; private set; } = string.Empty;
+    public string Name => FullName;
+    public int Age { get; private set; }
+    public string City { get; private set; } = string.Empty;
+    public DateTime CreatedAtUtc { get; private set; }
+    public DateTime UpdatedAtUtc { get; private set; }
+
+    public Participant()
+    {
+        CreatedAtUtc = DateTime.UtcNow;
+        UpdatedAtUtc = CreatedAtUtc;
+    }
 
     public Participant(string name)
     {
         ValidateName(name);
 
-        Name = name;
+        FullName = name;
         City = string.Empty;
+        CreatedAtUtc = DateTime.UtcNow;
+        UpdatedAtUtc = CreatedAtUtc;
     }
 
     public Participant(string name, int age)
@@ -21,9 +33,11 @@ public class Participant
         ValidateName(name);
         ValidateAge(age);
 
-        Name = name;
+        FullName = name;
         Age = age;
         City = string.Empty;
+        CreatedAtUtc = DateTime.UtcNow;
+        UpdatedAtUtc = CreatedAtUtc;
     }
 
     public Participant(string name, int age, string city)
@@ -32,14 +46,30 @@ public class Participant
         ValidateAge(age);
         ValidateCity(city);
 
-        Name = name;
+        FullName = name;
         Age = age;
         City = city;
+        CreatedAtUtc = DateTime.UtcNow;
+        UpdatedAtUtc = CreatedAtUtc;
+    }
+
+    public void Update(string fullName, int age, string city)
+    {
+        ValidateName(fullName);
+        ValidateAge(age);
+        ValidateCity(city);
+
+        FullName = fullName;
+        Age = age;
+        City = city;
+        UpdatedAtUtc = DateTime.UtcNow;
     }
 
     public bool CanDelete(IEnumerable<Prize> prizes)
     {
-        return !prizes.Any(prize => prize.Status == PrizeStatus.Assigned);
+        return !prizes.Any(prize =>
+            prize.ParticipantId == Id && prize.Status == PrizeStatus.Assigned
+        );
     }
 
     private static void ValidateName(string name)
@@ -48,7 +78,10 @@ public class Participant
             throw new ArgumentException("Participant name cannot be empty.", nameof(name));
 
         if (name.Length < 2 || name.Length > 80)
-            throw new ArgumentException("Participant name must be between 2 and 80 characters.", nameof(name));
+            throw new ArgumentException(
+                "Participant name must be between 2 and 80 characters.",
+                nameof(name)
+            );
     }
 
     private static void ValidateAge(int age)

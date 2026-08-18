@@ -134,7 +134,6 @@ public class PrizeTests
     [Fact]
     public void Prize_should_not_allow_name_shorter_than_2_characters()
     {
-        
         Assert.Throws<ArgumentException>(() => new Prize("A", 250));
     }
 

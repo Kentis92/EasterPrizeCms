@@ -11,5 +11,4 @@ public class PrizeResponse
     public int? ParticipantId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime UpdatedAtUtc { get; set; }
-    
 }
