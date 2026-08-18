@@ -50,6 +50,30 @@ public class ParticipantsController : ControllerBase
         );
     }
 
+    [HttpGet("{id:int}/prizes")]
+    public async Task<ActionResult<IEnumerable<PrizeResponse>>> GetPrizes(int id)
+    {
+        try
+        {
+            var prizes = await _service.GetPrizesAsync(id);
+
+            var response = prizes.Select(prize => new PrizeResponse
+            {
+                Id = prize.Id,
+                Name = prize.Name,
+                Value = prize.Value,
+                Status = prize.Status,
+                ParticipantId = prize.ParticipantId,
+            });
+
+            return Ok(response);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult<ParticipantResponse>> Create(CreateParticipantRequest request)
     {
@@ -120,10 +144,6 @@ public class ParticipantsController : ControllerBase
         catch (KeyNotFoundException)
         {
             return NotFound();
-        }
-        catch (InvalidOperationException exception)
-        {
-            return Conflict(exception.Message);
         }
     }
 }

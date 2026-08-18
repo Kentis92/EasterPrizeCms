@@ -119,6 +119,18 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Get_participant_prizes_should_return_200_ok()
+    {
+        var participant = new Participant("Ola Nordmann", 10, "Oslo") { Id = 100 };
+
+        await _repository.AddAsync(participant);
+
+        var response = await _client.GetAsync("/api/participants/100/prizes");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
 }
 
 public class ParticipantsApiFactory : WebApplicationFactory<Program>

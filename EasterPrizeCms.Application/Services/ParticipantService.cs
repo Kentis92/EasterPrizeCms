@@ -43,6 +43,18 @@ public class ParticipantService
         return await _repository.GetByIdAsync(id);
     }
 
+    public async Task<IEnumerable<Prize>> GetPrizesAsync(int participantId)
+    {
+        var participant = await _repository.GetByIdAsync(participantId);
+
+        if (participant is null)
+            throw new KeyNotFoundException("Participant not found.");
+
+        var prizes = await _prizeRepository.GetAllAsync();
+
+        return prizes.Where(prize => prize.ParticipantId == participantId);
+    }
+
     public async Task<Participant> UpdateAsync(int id, string name, int age, string city)
     {
         var participant = await _repository.GetByIdAsync(id);
