@@ -121,5 +121,9 @@ public class ParticipantsController : ControllerBase
         {
             return NotFound();
         }
+        catch (InvalidOperationException exception)
+        {
+            return Conflict(exception.Message);
+        }
     }
 }
