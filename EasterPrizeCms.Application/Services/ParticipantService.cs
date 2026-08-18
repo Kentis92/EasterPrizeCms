@@ -6,10 +6,12 @@ namespace EasterPrizeCms.Application.Services;
 public class ParticipantService
 {
     private readonly IParticipantRepository _repository;
+    private readonly IPrizeRepository _prizeRepository;
 
-    public ParticipantService(IParticipantRepository repository)
+    public ParticipantService(IParticipantRepository repository, IPrizeRepository prizeRepository)
     {
         _repository = repository;
+        _prizeRepository = prizeRepository;
     }
 
     public Participant Create(string name, int age, string city)
@@ -70,6 +72,13 @@ public class ParticipantService
 
         if (participant is null)
             throw new KeyNotFoundException("Participant not found.");
+
+        var prizes = await _prizeRepository.GetAllAsync();
+
+        if (!participant.CanDelete(prizes))
+            throw new InvalidOperationException(
+                "Participant cannot be deleted while they have assigned prizes."
+            );
 
         await _repository.DeleteAsync(participant);
     }

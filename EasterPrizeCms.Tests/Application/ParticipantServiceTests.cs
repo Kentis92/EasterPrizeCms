@@ -1,6 +1,7 @@
 using EasterPrizeCms.Application.Repositories;
 using EasterPrizeCms.Application.Services;
 using EasterPrizeCms.Domain.Entities;
+using EasterPrizeCms.Domain.Enums;
 
 namespace EasterPrizeCms.Tests.Application;
 
@@ -9,8 +10,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Participant_service_can_be_created()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         Assert.NotNull(service);
     }
@@ -18,8 +20,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_return_correct_data()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         var participant = service.Create("Ola", 10, "Oslo");
 
@@ -31,8 +34,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_negative_age()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         Assert.Throws<ArgumentException>(() => service.Create("Ola", -1, "Oslo"));
     }
@@ -40,8 +44,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_age_above_120()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         Assert.Throws<ArgumentException>(() => service.Create("Ola", 121, "Oslo"));
     }
@@ -49,8 +54,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_name_shorter_than_2_characters()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         Assert.Throws<ArgumentException>(() => service.Create("A", 10, "Oslo"));
     }
@@ -58,8 +64,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_name_longer_than_80_characters()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
         var name = new string('A', 81);
 
         Assert.Throws<ArgumentException>(() => service.Create(name, 10, "Oslo"));
@@ -68,8 +75,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_city_shorter_than_2_characters()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         Assert.Throws<ArgumentException>(() => service.Create("Ola", 10, "0"));
     }
@@ -77,8 +85,9 @@ public class ParticipantServiceTests
     [Fact]
     public void Create_participant_should_reject_city_longer_than_80_characters()
     {
-        var repository = new FakeParticipantRepository();
-        var service = new ParticipantService(repository);
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var service = new ParticipantService(participantRepository, prizeRepository);
         var city = new string('A', 81);
 
         Assert.Throws<ArgumentException>(() => service.Create("Ola", 10, city));
@@ -87,10 +96,11 @@ public class ParticipantServiceTests
     [Fact]
     public async Task Get_all_participants_should_return_participants()
     {
-        var repository = new FakeParticipantRepository();
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
         var participant = new Participant("Ola", 10, "Oslo");
-        await repository.AddAsync(participant);
-        var service = new ParticipantService(repository);
+        await participantRepository.AddAsync(participant);
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         var result = await service.GetAllAsync();
 
@@ -101,11 +111,12 @@ public class ParticipantServiceTests
     [Fact]
     public async Task Get_participant_by_id_should_return_participant()
     {
-        var repository = new FakeParticipantRepository();
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
         var participant = new Participant("Ola", 10, "Oslo");
         participant.Id = 1;
-        await repository.AddAsync(participant);
-        var service = new ParticipantService(repository);
+        await participantRepository.AddAsync(participant);
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         var result = await service.GetByIdAsync(1);
 
@@ -116,11 +127,12 @@ public class ParticipantServiceTests
     [Fact]
     public async Task Update_participant_should_update_data()
     {
-        var repository = new FakeParticipantRepository();
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
         var participant = new Participant("Ola", 10, "Oslo");
         participant.Id = 1;
-        await repository.AddAsync(participant);
-        var service = new ParticipantService(repository);
+        await participantRepository.AddAsync(participant);
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         await service.UpdateAsync(1, "Kari", 20, "Bergen");
 
@@ -132,15 +144,35 @@ public class ParticipantServiceTests
     [Fact]
     public async Task Delete_participant_should_remove_participant()
     {
-        var repository = new FakeParticipantRepository();
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
         var participant = new Participant("Ola", 10, "Oslo");
         participant.Id = 1;
-        await repository.AddAsync(participant);
-        var service = new ParticipantService(repository);
+        await participantRepository.AddAsync(participant);
+        var service = new ParticipantService(participantRepository, prizeRepository);
 
         await service.DeleteAsync(1);
 
-        Assert.Empty(await repository.GetAllAsync());
+        Assert.Empty(await participantRepository.GetAllAsync());
+    }
+
+    [Fact]
+    public async Task Delete_participant_with_assigned_prize_should_throw()
+    {
+        var participantRepository = new FakeParticipantRepository();
+        var prizeRepository = new FakePrizeRepository();
+        var participant = new Participant("Ola", 10, "Oslo");
+        participant.Id = 1;
+        await participantRepository.AddAsync(participant);
+
+        var prize = new Prize("Easter Egg", 100);
+        prize.Id = 1;
+        prize.Assign(participant.Id);
+        await prizeRepository.AddAsync(prize);
+
+        var service = new ParticipantService(participantRepository, prizeRepository);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => service.DeleteAsync(1));
     }
 
     private class FakeParticipantRepository : IParticipantRepository
@@ -172,6 +204,39 @@ public class ParticipantServiceTests
         public Task DeleteAsync(Participant participant)
         {
             _participants.Remove(participant);
+            return Task.CompletedTask;
+        }
+    }
+
+    private class FakePrizeRepository : IPrizeRepository
+    {
+        private readonly List<Prize> _prizes = [];
+
+        public Task<IEnumerable<Prize>> GetAllAsync()
+        {
+            return Task.FromResult<IEnumerable<Prize>>(_prizes);
+        }
+
+        public Task<Prize?> GetByIdAsync(int id)
+        {
+            var prize = _prizes.FirstOrDefault(p => p.Id == id);
+            return Task.FromResult(prize);
+        }
+
+        public Task AddAsync(Prize prize)
+        {
+            _prizes.Add(prize);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateAsync(Prize prize)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(Prize prize)
+        {
+            _prizes.Remove(prize);
             return Task.CompletedTask;
         }
     }
