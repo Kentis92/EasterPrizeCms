@@ -127,7 +127,7 @@ public class PrizesController : ControllerBase
         }
         catch (InvalidOperationException exception)
         {
-            return BadRequest(exception.Message);
+            return Conflict(exception.Message);
         }
     }
 
@@ -149,7 +149,7 @@ public class PrizesController : ControllerBase
         }
         catch (InvalidOperationException exception)
         {
-            return BadRequest(exception.Message);
+            return Conflict(exception.Message);
         }
     }
 
@@ -167,7 +167,7 @@ public class PrizesController : ControllerBase
         }
         catch (InvalidOperationException exception)
         {
-            return BadRequest(exception.Message);
+            return Conflict(exception.Message);
         }
     }
 }
