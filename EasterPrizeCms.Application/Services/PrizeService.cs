@@ -17,6 +17,11 @@ public class PrizeService
         return new Prize(name, value);
     }
 
+    public async Task AddAsync(Prize prize)
+    {
+        await _repository.AddAsync(prize);
+    }
+
     public async Task<IEnumerable<Prize>> GetAllAsync()
     {
         return await _repository.GetAllAsync();
@@ -27,7 +32,7 @@ public class PrizeService
         return await _repository.GetByIdAsync(id);
     }
 
-    public async Task UpdateAsync(int id, string name, decimal value)
+    public async Task<Prize> UpdateAsync(int id, string name, decimal value)
     {
         var prize = await _repository.GetByIdAsync(id);
 
@@ -37,6 +42,8 @@ public class PrizeService
         prize.Update(name, value);
 
         await _repository.UpdateAsync(prize);
+
+        return prize;
     }
 
     public async Task DeleteAsync(int id)
