@@ -66,6 +66,149 @@ public class PrizeServiceTests
         Assert.Throws<ArgumentException>(() => service.Create("Påskeegg XL", -1));
     }
 
+    [Fact]
+    public async Task Get_all_prizes_should_return_prizes()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        var result = await service.GetAllAsync();
+
+        Assert.Single(result);
+        Assert.Equal("Påskeegg XL", result.First().Name);
+    }
+
+    [Fact]
+    public async Task Get_prize_by_id_should_return_prize()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        var result = await service.GetByIdAsync(1);
+
+        Assert.NotNull(result);
+        Assert.Equal("Påskeegg XL", result.Name);
+    }
+
+    [Fact]
+    public async Task Update_prize_should_update_data()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        await service.UpdateAsync(1, "Påskeegg XXL", 500);
+
+        Assert.Equal("Påskeegg XXL", prize.Name);
+        Assert.Equal(500, prize.Value);
+    }
+
+    [Fact]
+    public async Task Delete_prize_should_remove_prize()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        await service.DeleteAsync(1);
+
+        Assert.Empty(await repository.GetAllAsync());
+    }
+
+    [Fact]
+    public async Task Assign_prize_should_assign_prize_to_participant()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        await service.AssignAsync(1, 5);
+
+        Assert.Equal(PrizeStatus.Assigned, prize.Status);
+        Assert.Equal(5, prize.ParticipantId);
+    }
+
+    [Fact]
+    public async Task Collect_prize_should_mark_prize_as_collected()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        prize.Assign(5);
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        await service.CollectAsync(1);
+
+        Assert.Equal(PrizeStatus.Collected, prize.Status);
+    }
+
+    [Fact]
+    public async Task Update_missing_prize_should_throw()
+    {
+        var repository = new FakePrizeRepository();
+        var service = new PrizeService(repository);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            service.UpdateAsync(999, "Påskeegg", 100));
+    }
+
+    [Fact]
+    public async Task Delete_missing_prize_should_throw()
+    {
+        var repository = new FakePrizeRepository();
+        var service = new PrizeService(repository);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            service.DeleteAsync(999));
+    }
+
+    [Fact]
+    public async Task Assign_missing_prize_should_throw()
+    {
+        var repository = new FakePrizeRepository();
+        var service = new PrizeService(repository);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            service.AssignAsync(999, 5));
+    }
+
+    [Fact]
+    public async Task Collect_missing_prize_should_throw()
+    {
+        var repository = new FakePrizeRepository();
+        var service = new PrizeService(repository);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            service.CollectAsync(999));
+    }
+
+    [Fact]
+    public async Task Collected_prize_should_not_be_deletable()
+    {
+        var repository = new FakePrizeRepository();
+        var prize = new Prize("Påskeegg XL", 250);
+        prize.Id = 1;
+        prize.Assign(5);
+        prize.Collect();
+        await repository.AddAsync(prize);
+        var service = new PrizeService(repository);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            service.DeleteAsync(1));
+    }
+
     private class FakePrizeRepository : IPrizeRepository
     {
         private readonly List<Prize> _prizes = [];
