@@ -13,11 +13,15 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
 {
     private readonly HttpClient _client;
     private readonly FakeParticipantRepository _repository;
+    private readonly FakePrizeRepository _prizeRepository;
 
     public ParticipantsControllerTests(ParticipantsApiFactory factory)
     {
         _client = factory.CreateClient();
         _repository = factory.Repository;
+        _prizeRepository = factory.PrizeRepository;
+        _repository.Clear();
+        _prizeRepository.Clear();
     }
 
     [Fact]
@@ -121,13 +125,29 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
     }
 
     [Fact]
+    public async Task Delete_participant_with_assigned_prize_should_return_409_conflict()
+    {
+        var participant = new Participant("Ola Nordmann", 10, "Oslo") { Id = 1 };
+        var prize = new Prize("Påskeegg XL", 250) { Id = 1 };
+
+        prize.Assign(participant.Id);
+
+        await _repository.AddAsync(participant);
+        await _prizeRepository.AddAsync(prize);
+
+        var response = await _client.DeleteAsync("/api/participants/1");
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Get_participant_prizes_should_return_200_ok()
     {
-        var participant = new Participant("Ola Nordmann", 10, "Oslo") { Id = 100 };
+        var participant = new Participant("Ola Nordmann", 10, "Oslo") { Id = 1 };
 
         await _repository.AddAsync(participant);
 
-        var response = await _client.GetAsync("/api/participants/100/prizes");
+        var response = await _client.GetAsync("/api/participants/1/prizes");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -136,13 +156,17 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
 public class ParticipantsApiFactory : WebApplicationFactory<Program>
 {
     public FakeParticipantRepository Repository { get; } = new();
+    public FakePrizeRepository PrizeRepository { get; } = new();
 
     protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IParticipantRepository>();
+            services.RemoveAll<IPrizeRepository>();
+
             services.AddSingleton<IParticipantRepository>(Repository);
+            services.AddSingleton<IPrizeRepository>(PrizeRepository);
         });
     }
 }
@@ -150,6 +174,11 @@ public class ParticipantsApiFactory : WebApplicationFactory<Program>
 public class FakeParticipantRepository : IParticipantRepository
 {
     private readonly List<Participant> _participants = [];
+
+    public void Clear()
+    {
+        _participants.Clear();
+    }
 
     public Task<IEnumerable<Participant>> GetAllAsync()
     {
