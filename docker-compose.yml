@@ -11,6 +11,18 @@ services:
     volumes:
       - easterprizecms_data:/var/lib/postgresql/data
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: easterprizecms-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
 
 volumes:
   easterprizecms_data:

@@ -69,6 +69,16 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
     }
 
     [Fact]
+    public async Task Post_prize_with_negative_value_should_return_400_bad_request()
+    {
+        var request = new CreatePrizeRequest { Name = "Nintendo Switch", Value = -1 };
+
+        var response = await _client.PostAsJsonAsync("/api/prizes", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Put_prize_should_return_200_ok()
     {
         var prize = new Prize("Nintendo Switch", 3000) { Id = 1 };
