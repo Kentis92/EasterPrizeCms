@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using EasterPrizeCms.Application.DTOs;
 using EasterPrizeCms.Application.Repositories;
 using EasterPrizeCms.Domain.Entities;
-using EasterPrizeCms.Domain.Enums;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -46,6 +45,17 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
         var response = await _client.PostAsJsonAsync("/api/prizes", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_prize_should_return_location_header()
+    {
+        var request = new CreatePrizeRequest { Name = "Nintendo Switch", Value = 3000 };
+
+        var response = await _client.PostAsJsonAsync("/api/prizes", request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
     }
 
     [Fact]
@@ -103,7 +113,7 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
     }
 
     [Fact]
-    public async Task Assign_prize_should_return_204_no_content()
+    public async Task Assign_prize_should_return_200_ok()
     {
         var prize = new Prize("Nintendo Switch", 3000) { Id = 1 };
 
@@ -113,11 +123,11 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
 
         var response = await _client.PostAsJsonAsync("/api/prizes/1/assign", request);
 
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
-    public async Task Collect_prize_should_return_204_no_content()
+    public async Task Collect_prize_should_return_200_ok()
     {
         var prize = new Prize("Nintendo Switch", 3000) { Id = 1 };
         prize.Assign(1);
@@ -126,7 +136,7 @@ public class PrizesControllerTests : IClassFixture<PrizesApiFactory>
 
         var response = await _client.PostAsync("/api/prizes/1/collect", null);
 
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
@@ -231,6 +241,7 @@ public class FakePrizeRepository : IPrizeRepository
     public Task<Prize?> GetByIdAsync(int id)
     {
         var prize = _prizes.FirstOrDefault(p => p.Id == id);
+
         return Task.FromResult(prize);
     }
 
@@ -240,6 +251,7 @@ public class FakePrizeRepository : IPrizeRepository
             prize.Id = _prizes.Count + 1;
 
         _prizes.Add(prize);
+
         return Task.CompletedTask;
     }
 
@@ -251,6 +263,7 @@ public class FakePrizeRepository : IPrizeRepository
     public Task DeleteAsync(Prize prize)
     {
         _prizes.Remove(prize);
+
         return Task.CompletedTask;
     }
 }

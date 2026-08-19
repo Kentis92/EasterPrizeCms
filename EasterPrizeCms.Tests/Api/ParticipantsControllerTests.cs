@@ -56,6 +56,22 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
     }
 
     [Fact]
+    public async Task Post_participant_should_return_location_header()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = 10,
+            City = "Oslo",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+    }
+
+    [Fact]
     public async Task Post_invalid_participant_should_return_400_bad_request()
     {
         var request = new CreateParticipantRequest
@@ -63,6 +79,81 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
             FullName = "A",
             Age = 10,
             City = "Oslo",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_participant_with_invalid_age_should_return_400_bad_request()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = 121,
+            City = "Oslo",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_participant_with_negative_age_should_return_400_bad_request()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = -1,
+            City = "Oslo",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_participant_with_empty_city_should_return_400_bad_request()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = 10,
+            City = "",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_participant_with_city_shorter_than_2_characters_should_return_400_bad_request()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = 10,
+            City = "O",
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/participants", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_participant_with_city_longer_than_80_characters_should_return_400_bad_request()
+    {
+        var request = new CreateParticipantRequest
+        {
+            FullName = "Ola Nordmann",
+            Age = 10,
+            City = new string('A', 81),
         };
 
         var response = await _client.PostAsJsonAsync("/api/participants", request);
@@ -150,6 +241,31 @@ public class ParticipantsControllerTests : IClassFixture<ParticipantsApiFactory>
         var response = await _client.GetAsync("/api/participants/1/prizes");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_participant_prizes_should_return_assigned_prizes()
+    {
+        var participant = new Participant("Ola Nordmann", 10, "Oslo") { Id = 1 };
+        var prize = new Prize("Påskeegg XL", 250) { Id = 1 };
+
+        prize.Assign(participant.Id);
+
+        await _repository.AddAsync(participant);
+        await _prizeRepository.AddAsync(prize);
+
+        var response = await _client.GetAsync("/api/participants/1/prizes");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<List<PrizeResponse>>();
+
+        Assert.NotNull(result);
+        Assert.Single(result);
+        Assert.Equal(1, result[0].Id);
+        Assert.Equal("Påskeegg XL", result[0].Name);
+        Assert.Equal(250, result[0].Value);
+        Assert.Equal(participant.Id, result[0].ParticipantId);
     }
 }
 

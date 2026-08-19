@@ -145,7 +145,7 @@ public class PrizesController : ControllerBase
         try
         {
             await _service.AssignAsync(id, request.ParticipantId);
-            return NoContent();
+            return Ok();
         }
         catch (KeyNotFoundException)
         {
@@ -167,7 +167,7 @@ public class PrizesController : ControllerBase
         try
         {
             await _service.CollectAsync(id);
-            return NoContent();
+            return Ok();
         }
         catch (KeyNotFoundException)
         {
